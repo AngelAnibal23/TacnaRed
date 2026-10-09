@@ -1,0 +1,421 @@
+{
+  "case_id": "TACNARED-01",
+  "simulation": true,
+  "company": "TacnaRed Servicios Tecnológicos",
+  "project": "Instalación de una red de 48 puntos en un local de dos pisos",
+  "location": "Tacna",
+  "currency": "PEN",
+  "project_time_unit": "día laborable",
+  "inventory_operating_days": 300,
+  "project_time_origin": "t = 0 al inicio del primer día laborable",
+  "activities": [
+    {
+      "id": "A",
+      "name": "Levantamiento de requisitos",
+      "predecessors": [],
+      "duration_cpm": 2,
+      "a": 1,
+      "m": 2,
+      "b": 3
+    },
+    {
+      "id": "B",
+      "name": "Diseño técnico y aprobación",
+      "predecessors": [
+        "A"
+      ],
+      "duration_cpm": 2,
+      "a": 1,
+      "m": 2,
+      "b": 5
+    },
+    {
+      "id": "C",
+      "name": "Verificación y reserva de materiales",
+      "predecessors": [
+        "B"
+      ],
+      "duration_cpm": 1,
+      "a": 1,
+      "m": 1,
+      "b": 1
+    },
+    {
+      "id": "D",
+      "name": "Instalación de canaletas",
+      "predecessors": [
+        "B"
+      ],
+      "duration_cpm": 3,
+      "a": 2,
+      "m": 3,
+      "b": 4
+    },
+    {
+      "id": "E",
+      "name": "Montaje del rack",
+      "predecessors": [
+        "B"
+      ],
+      "duration_cpm": 2,
+      "a": 1,
+      "m": 2,
+      "b": 3
+    },
+    {
+      "id": "F",
+      "name": "Tendido de cable",
+      "predecessors": [
+        "C",
+        "D"
+      ],
+      "duration_cpm": 4,
+      "a": 3,
+      "m": 4,
+      "b": 7
+    },
+    {
+      "id": "G",
+      "name": "Terminación de puntos y paneles",
+      "predecessors": [
+        "E",
+        "F"
+      ],
+      "duration_cpm": 3,
+      "a": 2,
+      "m": 3,
+      "b": 6
+    },
+    {
+      "id": "H",
+      "name": "Instalación y configuración de switches",
+      "predecessors": [
+        "G"
+      ],
+      "duration_cpm": 2,
+      "a": 1,
+      "m": 2,
+      "b": 3
+    },
+    {
+      "id": "I",
+      "name": "Certificación y pruebas integrales",
+      "predecessors": [
+        "H"
+      ],
+      "duration_cpm": 2,
+      "a": 1,
+      "m": 2,
+      "b": 5
+    },
+    {
+      "id": "J",
+      "name": "Corrección de observaciones",
+      "predecessors": [
+        "I"
+      ],
+      "duration_cpm": 1,
+      "a": 0.5,
+      "m": 1,
+      "b": 1.5
+    },
+    {
+      "id": "K",
+      "name": "Documentación y planos finales",
+      "predecessors": [
+        "G"
+      ],
+      "duration_cpm": 2,
+      "a": 1,
+      "m": 2,
+      "b": 3
+    },
+    {
+      "id": "L",
+      "name": "Aceptación y entrega",
+      "predecessors": [
+        "J",
+        "K"
+      ],
+      "duration_cpm": 1,
+      "a": 0.5,
+      "m": 1,
+      "b": 1.5
+    }
+  ],
+  "products": [
+    {
+      "id": "MAT01",
+      "name": "Cable UTP Cat 6",
+      "unit": "m",
+      "annual_demand": 36000,
+      "unit_cost": 2.4,
+      "order_cost": 75,
+      "holding_rate": 0.2,
+      "holding_cost": 0.48,
+      "lead_time_days": 5,
+      "safety_stock": 300,
+      "stock": 2200,
+      "order_multiple": 305,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 610,
+      "capacity": 5000,
+      "supplier_id": "PROV01",
+      "supply_policy": "Revisión continua con EOQ"
+    },
+    {
+      "id": "MAT02",
+      "name": "Switch de 24 puertos",
+      "unit": "unidad",
+      "annual_demand": 40,
+      "unit_cost": 850,
+      "order_cost": 50,
+      "holding_rate": 0.2,
+      "holding_cost": 170.0,
+      "lead_time_days": 4,
+      "safety_stock": 0,
+      "stock": 2,
+      "order_multiple": 1,
+      "eoq_eligible": false,
+      "baseline_order_quantity": null,
+      "capacity": null,
+      "supplier_id": "PROV01",
+      "supply_policy": "Compra y reserva según proyecto"
+    },
+    {
+      "id": "MAT03",
+      "name": "Patch cord Cat 6",
+      "unit": "unidad",
+      "annual_demand": 1920,
+      "unit_cost": 12,
+      "order_cost": 35,
+      "holding_rate": 0.2,
+      "holding_cost": 2.4000000000000004,
+      "lead_time_days": 3,
+      "safety_stock": 20,
+      "stock": 110,
+      "order_multiple": 1,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 100,
+      "capacity": null,
+      "supplier_id": "PROV01",
+      "supply_policy": "Revisión continua con EOQ"
+    },
+    {
+      "id": "MAT04",
+      "name": "Canaleta de 2 metros",
+      "unit": "pieza",
+      "annual_demand": 1200,
+      "unit_cost": 16,
+      "order_cost": 45,
+      "holding_rate": 0.2,
+      "holding_cost": 3.2,
+      "lead_time_days": 4,
+      "safety_stock": 20,
+      "stock": 100,
+      "order_multiple": 1,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 60,
+      "capacity": null,
+      "supplier_id": "PROV02",
+      "supply_policy": "Revisión continua con EOQ"
+    },
+    {
+      "id": "MAT05",
+      "name": "Jack Cat 6",
+      "unit": "unidad",
+      "annual_demand": 960,
+      "unit_cost": 18,
+      "order_cost": 35,
+      "holding_rate": 0.2,
+      "holding_cost": 3.6,
+      "lead_time_days": 3,
+      "safety_stock": 10,
+      "stock": 70,
+      "order_multiple": 1,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 48,
+      "capacity": null,
+      "supplier_id": "PROV01",
+      "supply_policy": "Revisión continua con EOQ"
+    },
+    {
+      "id": "MAT06",
+      "name": "Rack mural de 12U",
+      "unit": "unidad",
+      "annual_demand": 20,
+      "unit_cost": 420,
+      "order_cost": 60,
+      "holding_rate": 0.2,
+      "holding_cost": 84.0,
+      "lead_time_days": 7,
+      "safety_stock": 0,
+      "stock": 1,
+      "order_multiple": 1,
+      "eoq_eligible": false,
+      "baseline_order_quantity": null,
+      "capacity": null,
+      "supplier_id": "PROV01",
+      "supply_policy": "Compra y reserva según proyecto"
+    },
+    {
+      "id": "MAT07",
+      "name": "Patch panel de 24 puertos",
+      "unit": "unidad",
+      "annual_demand": 40,
+      "unit_cost": 190,
+      "order_cost": 40,
+      "holding_rate": 0.2,
+      "holding_cost": 38.0,
+      "lead_time_days": 4,
+      "safety_stock": 0,
+      "stock": 2,
+      "order_multiple": 1,
+      "eoq_eligible": false,
+      "baseline_order_quantity": null,
+      "capacity": null,
+      "supplier_id": "PROV01",
+      "supply_policy": "Compra y reserva según proyecto"
+    },
+    {
+      "id": "MAT08",
+      "name": "Conector RJ45",
+      "unit": "unidad",
+      "annual_demand": 2400,
+      "unit_cost": 0.8,
+      "order_cost": 20,
+      "holding_rate": 0.2,
+      "holding_cost": 0.16000000000000003,
+      "lead_time_days": 3,
+      "safety_stock": 50,
+      "stock": 180,
+      "order_multiple": 100,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 100,
+      "capacity": null,
+      "supplier_id": "PROV01",
+      "supply_policy": "Revisión continua con EOQ"
+    },
+    {
+      "id": "MAT09",
+      "name": "Cinta de velcro de 10 metros",
+      "unit": "rollo",
+      "annual_demand": 200,
+      "unit_cost": 9,
+      "order_cost": 15,
+      "holding_rate": 0.2,
+      "holding_cost": 1.8,
+      "lead_time_days": 2,
+      "safety_stock": 5,
+      "stock": 15,
+      "order_multiple": 1,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 10,
+      "capacity": null,
+      "supplier_id": "PROV02",
+      "supply_policy": "Revisión continua con EOQ"
+    },
+    {
+      "id": "MAT10",
+      "name": "Tornillo con tarugo",
+      "unit": "juego",
+      "annual_demand": 4000,
+      "unit_cost": 0.15,
+      "order_cost": 15,
+      "holding_rate": 0.2,
+      "holding_cost": 0.03,
+      "lead_time_days": 2,
+      "safety_stock": 100,
+      "stock": 300,
+      "order_multiple": 100,
+      "eoq_eligible": true,
+      "baseline_order_quantity": 200,
+      "capacity": null,
+      "supplier_id": "PROV02",
+      "supply_policy": "Revisión continua con EOQ"
+    }
+  ],
+  "material_requirements": [
+    {
+      "activity_id": "D",
+      "product_id": "MAT04",
+      "quantity": 60
+    },
+    {
+      "activity_id": "E",
+      "product_id": "MAT06",
+      "quantity": 1
+    },
+    {
+      "activity_id": "E",
+      "product_id": "MAT10",
+      "quantity": 120
+    },
+    {
+      "activity_id": "F",
+      "product_id": "MAT01",
+      "quantity": 1800
+    },
+    {
+      "activity_id": "F",
+      "product_id": "MAT09",
+      "quantity": 4
+    },
+    {
+      "activity_id": "G",
+      "product_id": "MAT05",
+      "quantity": 48
+    },
+    {
+      "activity_id": "G",
+      "product_id": "MAT07",
+      "quantity": 2
+    },
+    {
+      "activity_id": "G",
+      "product_id": "MAT08",
+      "quantity": 10
+    },
+    {
+      "activity_id": "G",
+      "product_id": "MAT10",
+      "quantity": 80
+    },
+    {
+      "activity_id": "H",
+      "product_id": "MAT02",
+      "quantity": 2
+    },
+    {
+      "activity_id": "H",
+      "product_id": "MAT03",
+      "quantity": 96
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "PROV01",
+      "name": "Distribuidor de redes simulado",
+      "simulated": true
+    },
+    {
+      "id": "PROV02",
+      "name": "Proveedor de montaje simulado",
+      "simulated": true
+    }
+  ],
+  "assumptions": [
+    "Todos los datos de empresa, demanda, precios, duraciones, proveedores y stock son simulados para uso académico.",
+    "48 puntos de red distribuidos en dos pisos, 24 puntos por piso.",
+    "El cable requerido es una estimación agregada de 1800 m; el diseño físico y la certificación deben comprobar cada enlace.",
+    "No se modelan límites de cuadrillas ni nivelación de recursos. D y E pueden ejecutarse en paralelo.",
+    "Las precedencias son fin a inicio, sin desfases.",
+    "La reserva C dura un día y no incluye plazo de compra; el escenario base tiene materiales disponibles.",
+    "La demanda anual incluye instalaciones y mantenimiento; no se infiere exclusivamente de esta obra.",
+    "EOQ se aplica como aproximación de demanda uniforme para consumibles; equipos específicos se abastecen por proyecto.",
+    "El stock de seguridad se fija por política simulada, sin derivar un nivel de servicio estadístico.",
+    "Los costos están en soles; H incluye mantenimiento y almacenamiento, sin sumar nuevamente ese mismo concepto.",
+    "Los 300 días anuales son un parámetro del almacén, independiente del calendario de la instalación.",
+    "PERT supone independencia entre duraciones para sumar varianzas; la probabilidad normal corresponde a una ruta fija y es aproximada."
+  ]
+}

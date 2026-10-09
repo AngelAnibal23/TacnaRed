@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {spawn} from 'node:child_process';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {resolve,join,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE??'playwright');
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const data=mkdtempSync(join(tmpdir(),'tacnared-theme-'));
+const out=resolve(process.env.QA_OUTPUT??join(root,'qa-theme'));mkdirSync(out,{recursive:true});
+const server=spawn(process.execPath,['server/main.ts'],{cwd:root,windowsHide:true,env:{...process.env,PORT:'4187',HOST:'127.0.0.1',DATA_DIR:data,OPERADOR_PASSWORD:'prueba-tema',NODE_ENV:'test'},stdio:['ignore','pipe','pipe']});
+const url='http://127.0.0.1:4187';let log='';server.stdout.on('data',c=>log+=c);server.stderr.on('data',c=>log+=c);
+let browser,page;const checks=[],errors=[];
+const ok=label=>{checks.push(label);console.log('OK · '+label);};
+const dark=async()=>assert.equal(await page.evaluate(()=>document.documentElement.dataset.theme),'dark');
+try{
+ let ready=false;for(let i=0;i<100;i++){try{if((await fetch(url+'/api/health')).ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,100));}assert.ok(ready,log);
+ browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE||undefined});
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});page=await context.newPage();page.setDefaultTimeout(5000);page.on('pageerror',err=>errors.push(err.message));
+ await page.goto(url);
+ const toggle=()=>page.getByRole('switch',{name:'Modo oscuro',exact:true});
+ await toggle().waitFor();assert.equal(await toggle().getAttribute('aria-checked'),'false');
+ await toggle().click();await dark();assert.equal(await toggle().getAttribute('aria-checked'),'true');ok('Switch accesible cambia claro a oscuro en el acceso');
+ await page.reload();await toggle().waitFor();await dark();ok('El tema oscuro se conserva al recargar');
+ await page.getByLabel('Clave del operador',{exact:true}).fill('prueba-tema');await page.getByRole('button',{name:'Entrar a TacnaRed'}).click();await page.getByRole('heading',{name:'Una red lista. Cuatro decisiones conectadas.'}).waitFor();await dark();
+ await page.screenshot({path:join(out,'05_resumen_dark.png'),fullPage:true});ok('Tema conservado al entrar en la aplicación');
+ const nav=label=>page.locator('nav').getByRole('button',{name:label,exact:true}).click();
+ await nav('CPM y PERT');assert.equal(await page.getByRole('heading',{name:'CPM y PERT',exact:true}).count(),1);
+ const criticalColor=await page.locator('.gantt rect').first().evaluate(el=>getComputedStyle(el).fill);
+ assert.equal(criticalColor,'rgb(255, 123, 34)');
+ await page.getByRole('button',{name:'PERT',exact:true}).click();await page.getByText('67.47 %',{exact:true}).waitFor();await page.screenshot({path:join(out,'06_metodos_dark.png'),fullPage:true});ok('Gráficos usan naranja y azul y PERT conserva su resultado');
+ await nav('Inventario');await page.getByRole('button',{name:'Editar producto MAT01',exact:true}).click();await page.getByRole('dialog').waitFor();
+ const formStyle=await page.getByRole('dialog').getByLabel('Nombre',{exact:true}).evaluate(el=>({bg:getComputedStyle(el).backgroundColor,color:getComputedStyle(el).color}));
+ assert.notEqual(formStyle.bg,'rgb(255, 255, 255)');await page.screenshot({path:join(out,'07_formulario_dark.png'),fullPage:true});await page.getByRole('button',{name:'Cerrar diálogo'}).click();ok('Formulario y catálogo mantienen el tema oscuro');
+ for(const label of ['EOQ y pedidos','Clasificación ABC','Escenarios','Proyecto y actividades','Informe']){await nav(label);await dark();}
+ await page.emulateMedia({media:'print'});const paper=await page.evaluate(()=>({background:getComputedStyle(document.body).backgroundColor,color:getComputedStyle(document.body).color}));assert.equal(paper.background,'rgb(255, 255, 255)');assert.equal(paper.color,'rgb(0, 0, 0)');assert.equal(await page.locator('.report-content .gantt rect').first().evaluate(el=>getComputedStyle(el).fill),'rgb(197, 69, 61)');assert.equal(await page.locator('.report-content th').first().evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)');await page.emulateMedia({media:'screen'});ok('Impresión permanece blanca con texto negro desde el tema oscuro');
+ await toggle().focus();await page.keyboard.press('Space');assert.equal(await toggle().getAttribute('aria-checked'),'false');await page.reload();await toggle().waitFor();assert.equal(await page.evaluate(()=>document.documentElement.dataset.theme),'light');ok('Switch operable por teclado y regreso persistente al modo claro');
+ await toggle().click();await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Abrir navegación'}).click();await nav('Resumen');await dark();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:join(out,'08_movil_dark.png'),fullPage:true});ok('Switch visible y tema sin desbordamiento en móvil');
+ assert.deepEqual(errors,[]);ok('Sin errores de ejecución en ambos temas');
+ writeFileSync(join(out,'tema_resultado.json'),JSON.stringify({status:'passed',checks,errors},null,2));
+}catch(err){if(page)await page.screenshot({path:join(out,'tema_fallo.png'),fullPage:true}).catch(()=>{});throw err;}finally{if(browser)await browser.close();if(server.exitCode===null){server.kill();await new Promise(r=>server.once('exit',r));}rmSync(data,{recursive:true,force:true});}

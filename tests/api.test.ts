@@ -1,0 +1,41 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createApp} from '../server/app.ts';
+test('API: autentica, persiste, valida, registra stock y evita sobrescrituras',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'tacnared-'));
+ let app:any;
+ try {
+  app=await createApp({dataDir:dir,password:'clave-prueba',serveStatic:false});
+  assert.equal((await app.inject({method:'GET',url:'/api/state'})).statusCode,401);
+  assert.equal((await app.inject({method:'POST',url:'/api/login',payload:{password:'errada'}})).statusCode,401);
+  const login=await app.inject({method:'POST',url:'/api/login',payload:{password:'clave-prueba'}});
+  assert.equal(login.statusCode,200);
+  const cookie=login.headers['set-cookie'].split(';')[0];const headers={cookie};
+  const original=(await app.inject({method:'GET',url:'/api/state',headers})).json();
+  const changed=structuredClone(original);changed.projects[0].name='Proyecto guardado';changed.projects[0].control_day=12;changed.projects[0].activities.find((a:any)=>a.id==='C').actual_finish=6;
+  const saved=await app.inject({method:'PUT',url:'/api/state',headers,payload:changed});
+  assert.equal(saved.statusCode,200);assert.equal(saved.json().revision,original.revision+1);
+  assert.equal((await app.inject({method:'PUT',url:'/api/state',headers,payload:changed})).statusCode,409);
+  const bad=structuredClone(saved.json());bad.projects[0].activities[0].predecessors=['L'];
+  assert.equal((await app.inject({method:'PUT',url:'/api/state',headers,payload:bad})).statusCode,400);
+  const movement=await app.inject({method:'POST',url:'/api/movements',headers,payload:{revision:saved.json().revision,product_id:'MAT01',kind:'exit',quantity:100,reason:'Prueba de salida'}});
+  assert.equal(movement.statusCode,200);assert.equal(movement.json().products[0].stock,2100);
+  assert.equal(movement.json().movements.length,1);
+  const negative=await app.inject({method:'POST',url:'/api/movements',headers,payload:{revision:movement.json().revision,product_id:'MAT01',kind:'exit',quantity:9999,reason:'Salida inválida'}});
+  assert.equal(negative.statusCode,400);
+  await app.close();
+  app=await createApp({dataDir:dir,password:'clave-prueba',serveStatic:false});
+  const login2=await app.inject({method:'POST',url:'/api/login',payload:{password:'clave-prueba'}});
+  const headers2={cookie:login2.headers['set-cookie'].split(';')[0]};
+  const recovered=(await app.inject({method:'GET',url:'/api/state',headers:headers2})).json();
+  assert.equal(recovered.projects[0].name,'Proyecto guardado');assert.equal(recovered.products[0].stock,2100);assert.equal(recovered.projects[0].control_day,12);assert.equal(recovered.projects[0].activities.find((a:any)=>a.id==='C').actual_finish,6);
+  assert.equal((await app.inject({method:'POST',url:'/api/demo/reset',headers:headers2,payload:{revision:original.revision}})).statusCode,409);
+  const reset=await app.inject({method:'POST',url:'/api/demo/reset',headers:headers2,payload:{revision:recovered.revision}});
+  assert.equal(reset.statusCode,200);assert.equal(reset.json().products[0].stock,2200);
+  assert.equal((await app.inject({method:'POST',url:'/api/logout',headers:headers2})).statusCode,200);
+  assert.equal((await app.inject({method:'GET',url:'/api/state',headers:headers2})).statusCode,401);
+ }finally{if(app)await app.close();rmSync(dir,{recursive:true,force:true});}
+});
