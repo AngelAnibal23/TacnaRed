@@ -161,4 +161,14 @@
  :root[data-theme="dark"] .loading{color:#a7c7f0}
  :root[data-theme="dark"] .startup-error{background:#2b1c13;color:#ffc397;border-color:#855032}
  :root[data-theme="dark"]{scrollbar-color:#3c5c83 #0a111d}
+ :root[data-theme="dark"] .alert-row{background:#0c1520;border-color:#27354a;border-left-color:#46638a}
+ :root[data-theme="dark"] .alert-row.danger{background:#1c1210;border-left-color:#ff7b22}
+ :root[data-theme="dark"] .alert-row.warning{background:#1a1510;border-left-color:#ffb066}
+ :root[data-theme="dark"] .alert-dot{background:#5f7d9f}
+ :root[data-theme="dark"] .alert-row.danger .alert-dot{background:#ff7b22}
+ :root[data-theme="dark"] .alert-row.warning .alert-dot{background:#ffb066}
+ :root[data-theme="dark"] .alert-body p{color:#a3b5d0}
+ :root[data-theme="dark"] .import-preview{border-color:#27354a}
+ :root[data-theme="dark"] .import-preview th{background:#101b2d}
+ :root[data-theme="dark"] .modal .form-actions.import-actions{background:#0c1523;box-shadow:0 -6px 14px #00000035}
 }

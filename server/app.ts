@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
 import {randomBytes,randomUUID,timingSafeEqual} from 'node:crypto';
 import {createStore,seed} from './store.ts';
+import {buildWorkbook} from './xlsx.ts';
 import {number,text,validateState,schedule,pert,abc,eoq} from '../domain/engine.ts';
 import type {AppState} from '../domain/types.ts';
 export interface Options {dataDir?:string;password?:string;serveStatic?:boolean;production?:boolean;}
@@ -75,6 +76,12 @@ export async function createApp(options:Options={}){
   const {state,project_id,deadline}=req.body;validateState(state);
   const p=state.projects.find(x=>x.id===project_id);if(!p)throw new Error('Proyecto inexistente.');
   return {cpm:schedule(p.activities),pert:pert(p.activities,deadline),abc:abc(state.products),eoq:state.products.filter(x=>x.eoq_eligible).map(x=>{try{return {id:x.id,...eoq(x,state.operating_days)};}catch(error){return {id:x.id,error:(error as Error).message};}})};
+ });
+ app.post<{Body:{state:AppState;project_id:string}}>('/api/export/xlsx',async(req,reply)=>{
+  const {state,project_id}=req.body;validateState(state);
+  const project=state.projects.find(p=>p.id===project_id)??state.projects[0];
+  const buffer=await buildWorkbook(state,project);
+  return reply.header('Content-Type','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet').header('Content-Disposition','attachment; filename="tacnared-'+project.id+'.xlsx"').send(buffer);
  });
  const dist=fileURLToPath(new URL('../dist/',import.meta.url));
  if(options.serveStatic!==false&&existsSync(resolve(dist,'index.html'))){
