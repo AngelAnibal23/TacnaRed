@@ -21,6 +21,30 @@
 @media(max-width:530px){.table-wrap table{min-width:680px}.table-wrap td:first-child,.table-wrap th:first-child{min-width:160px}}
 
 .panel>.control-subtitle{padding:0 24px;margin:0 0 14px;font-size:15px}
+.alert-list{list-style:none;margin:0;padding:0 24px 22px;display:grid;gap:11px}
+.alert-row{display:flex;align-items:flex-start;gap:14px;border:1px solid var(--line);border-left:3px solid #9cb2c6;border-radius:8px;padding:14px 16px;background:#fbfdff}
+.alert-row.danger{border-left-color:var(--red);background:#fff8f7}
+.alert-row.warning{border-left-color:#d9a04a;background:#fffdf7}
+.alert-dot{width:8px;height:8px;border-radius:50%;background:#9cb2c6;margin-top:6px;flex-shrink:0}
+.alert-row.danger .alert-dot{background:var(--red)}
+.alert-row.warning .alert-dot{background:#c9913a}
+.alert-body{flex:1;min-width:0}
+.alert-body strong{font-size:13px;font-weight:600;line-height:1.5;display:block}
+.alert-body p{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.75}
+.alert-row>.button{flex-shrink:0;white-space:nowrap}
+.import-toolbar{padding:0;flex-wrap:wrap;align-items:flex-end;gap:14px;margin-bottom:18px}
+.import-toolbar .field{max-width:340px}
+.import-toolbar .button{margin-bottom:1px}
+.import-issues{margin:9px 0 0;padding-left:18px;font-size:11.5px;line-height:1.85}
+.import-report{margin-top:18px}
+.import-preview{max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;margin-top:14px}
+.import-preview th{position:sticky;top:0;z-index:1}
+.modal .segmented.wide{margin:0 0 18px;max-width:100%;width:max-content}
+.modal textarea{font-family:Consolas,monospace;font-size:12px;line-height:1.7}
+.modal .form-actions.import-actions{position:sticky;bottom:-25px;z-index:3;margin:24px -28px -25px;padding:18px 28px;background:#fff;box-shadow:0 -6px 14px #1b35510f}
+@media(max-width:530px){.modal .form-actions.import-actions{margin:20px -20px -20px;padding:16px 20px}}
+@media(max-width:800px){.alert-row{flex-direction:column;gap:8px}.alert-dot{margin-top:0}.alert-row>.button{align-self:flex-start}}
+@media print{.alert-list{padding:0}.alert-row{break-inside:avoid}}
 @media print{
  .app-shell,.workspace,.main-content,.report-content,.panel{background:#fff!important}
  .report-content .notice,.report-content .notice.warning,.report-content .notice.danger{background:#fff;color:#000;border:1px solid #000;border-radius:0;margin:0 0 12px;padding:8px}

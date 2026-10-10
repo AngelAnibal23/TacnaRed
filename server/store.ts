@@ -4,7 +4,12 @@ import {resolve} from 'node:path';
 import {schedule,validateState} from '../domain/engine.ts';
 import type {AppState} from '../domain/types.ts';
 export function seed(revision=0):AppState {
- const c=JSON.parse(readFileSync(new URL('../data/caso.json',import.meta.url),'utf8'));
+ let raw:string;
+ try{raw=readFileSync(new URL('../data/caso.json',import.meta.url),'utf8');}
+ catch{
+  throw new Error('No se encontró data/caso.json, el caso inicial del que se crea la base. En Docker, el volumen persistente no debe montarse sobre /app/data: usa /app/db con DATA_DIR=/app/db.');
+ }
+ const c=JSON.parse(raw);
  const plan=schedule(c.activities);
  const state:AppState={revision,company:c.company,operating_days:c.inventory_operating_days,
   projects:[{id:c.case_id,name:c.project,control_day:11,activities:plan.rows.map(r=>({id:r.id,name:r.name,predecessors:r.predecessors,duration_cpm:r.duration_cpm,a:r.a,m:r.m,b:r.b,progress:Math.min(100,Math.max(0,(11-r.es)/r.duration*100)),actual_duration:r.duration_cpm,...(r.ef<=11?{actual_start:r.es,actual_finish:r.ef}:r.es<11?{actual_start:r.es}:{})})),requirements:c.material_requirements}],
