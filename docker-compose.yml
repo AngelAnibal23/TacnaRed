@@ -1,0 +1,20 @@
+services:
+  tacnared:
+    build: .
+    image: tacnared:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4173
+      # La base SQLite se escribe fuera de /app/data para no ocultar la semilla
+      # data/caso.json que viene dentro de la imagen (ver Dockerfile).
+      DATA_DIR: /app/db
+    ports:
+      - "127.0.0.1:4173:4173"
+    volumes:
+      - tacnared-db:/app/db
+
+volumes:
+  tacnared-db:
